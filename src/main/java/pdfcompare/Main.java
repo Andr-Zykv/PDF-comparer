@@ -28,6 +28,9 @@ public final class Main {
               --no-json         skip writing a JSON report
               --fail-at LEVEL   exit 1 if any difference reaches this severity (default: ERROR)
                                 LEVEL is one of INFO, WARNING, ERROR
+              --fail-fast       stop after the first stage that reaches --fail-at; skips later,
+                                more expensive stages once the documents are already known to
+                                differ enough to fail
             """;
 
     private Main() {
@@ -51,7 +54,7 @@ public final class Main {
 
         Report report;
         try {
-            report = defaultComparer().compare(options.expected(), options.actual());
+            report = defaultComparer(options).compare(options.expected(), options.actual());
         } catch (IOException e) {
             err.println("error comparing PDFs: " + e.getMessage());
             return 2;
@@ -73,11 +76,12 @@ public final class Main {
         return report.hasAtLeast(options.failAt()) ? 1 : 0;
     }
 
-    private static Comparer defaultComparer() {
+    private static Comparer defaultComparer(Options options) {
         return new Comparer(
                 List.of(new StructureStage(), new MetadataStage(), new TextStage(),
                         new TableStage(), new VisualStage()),
-                Policy.defaults());
+                Policy.defaults(),
+                options.failFast() ? options.failAt() : null);
     }
 
     private static void printSummary(Report report, PrintStream out) {

@@ -107,6 +107,38 @@ class MainTest {
     }
 
     @Test
+    void withoutFailFastLaterStagesStillReportEvenAfterAnEarlierErrorStage() throws IOException {
+        // page count differs (STRUCTURE, ERROR) AND the title differs (METADATA, WARNING) -
+        // without --fail-fast both show up, since every stage runs regardless.
+        Path expected = savePdf("expected.pdf", 1, "Old Title");
+        Path actual = savePdf("actual.pdf", 2, "New Title");
+        Capture cap = new Capture();
+
+        int code = Main.run(new String[] {expected.toString(), actual.toString()}, cap.out, cap.err);
+
+        assertEquals(1, code);
+        assertTrue(cap.out().contains("[ERROR"));
+        assertTrue(cap.out().contains("[WARNING"));
+        assertTrue(cap.out().contains("info.Title"));
+    }
+
+    @Test
+    void failFastStopsAtTheFirstStageThatReachesFailAt() throws IOException {
+        // same two PDFs as above, but --fail-fast means METADATA (and everything after
+        // STRUCTURE) never runs once STRUCTURE's page-count difference already reaches ERROR.
+        Path expected = savePdf("expected.pdf", 1, "Old Title");
+        Path actual = savePdf("actual.pdf", 2, "New Title");
+        Capture cap = new Capture();
+
+        int code = Main.run(new String[] {expected.toString(), actual.toString(), "--fail-fast"}, cap.out, cap.err);
+
+        assertEquals(1, code);
+        assertTrue(cap.out().contains("[ERROR"));
+        assertFalse(cap.out().contains("info.Title"));
+        assertFalse(cap.out().contains("[WARNING"));
+    }
+
+    @Test
     void noJsonFlagSkipsWritingAReportFile() throws IOException {
         Path expected = savePdf("expected.pdf", 1, "Report");
         Path actual = savePdf("actual.pdf", 1, "Report");

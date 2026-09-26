@@ -10,8 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OptionsTest {
 
@@ -31,6 +33,15 @@ class OptionsTest {
         Options options = Options.parse(new String[] {expected, actual});
         assertEquals(dir.resolve("actual.diff.json"), options.jsonPath());
         assertEquals(Severity.ERROR, options.failAt());
+        assertFalse(options.failFast());
+    }
+
+    @Test
+    void failFastIsOffByDefaultAndOnWithTheFlag() throws IOException {
+        String expected = touch("expected.pdf");
+        String actual = touch("actual.pdf");
+        Options options = Options.parse(new String[] {expected, actual, "--fail-fast"});
+        assertTrue(options.failFast());
     }
 
     @Test
