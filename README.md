@@ -1,6 +1,6 @@
 PDF-comparer
 =======
--------
+
 This program for comparing PDFs runs comparisons in 4 stages:
  - Structure (skeleton of the document: amount of pages, font families, annotations)
  - Metadata (information about the creation, the creator, header info)
