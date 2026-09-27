@@ -8,7 +8,6 @@ import pdfcompare.core.Report;
 import pdfcompare.core.Severity;
 import pdfcompare.stages.MetadataStage;
 import pdfcompare.stages.StructureStage;
-import pdfcompare.stages.TableStage;
 import pdfcompare.stages.TextStage;
 import pdfcompare.stages.VisualStage;
 
@@ -79,7 +78,7 @@ public final class Main {
     private static Comparer defaultComparer(Options options) {
         return new Comparer(
                 List.of(new StructureStage(), new MetadataStage(), new TextStage(),
-                        new TableStage(), new VisualStage()),
+                        new VisualStage()),
                 Policy.defaults(),
                 options.failFast() ? options.failAt() : null);
     }

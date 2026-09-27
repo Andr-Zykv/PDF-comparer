@@ -5,6 +5,5 @@ public enum Stage {
     STRUCTURE,
     METADATA,
     TEXT,
-    TABLE,
     VISUAL
 }
