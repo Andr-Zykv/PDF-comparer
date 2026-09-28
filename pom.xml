@@ -30,9 +30,47 @@
     <build>
         <plugins>
             <plugin>
+                <!-- Pinned explicitly: without a version here, Maven falls back to whatever
+                     default binding the local Maven install has, which on an old install can be
+                     ancient enough to predate maven.compiler.release support entirely (that
+                     property needs 3.6+) and silently compile with its own source=1.5/target=1.5
+                     default instead - the exact failure this pin avoids. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
+            </plugin>
+            <plugin>
+                <!-- Fails fast with a clear message on a too-old Maven or JDK, instead of a
+                     confusing downstream error - an ancient default compiler-plugin version
+                     rejecting maven.compiler.release, or javac itself rejecting release 17.
+                     maven-compiler-plugin runs in-process using whichever JDK launched Maven
+                     (no separate toolchain is configured), so that JDK must be 17+ too. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.6.3,)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[17,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <!-- Bundles pdf-compare and its dependencies (PDFBox, commons-logging, ...) into
