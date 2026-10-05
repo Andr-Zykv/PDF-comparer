@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Classic LCS-backed edit-script diff over two word lists. Package-private: an implementation
+ * Longest Common Subsequence(LCS)-backed edit-script diff over two word lists. Package-private: an implementation
  * detail of {@link TextStage}.
  *
  * <p>Builds the full dynamic-programming table, so it is O(n*m) time and space; callers should
