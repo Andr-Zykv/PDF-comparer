@@ -6,7 +6,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Parsed command-line arguments for {@link Main}. Package-private: an implementation detail.
@@ -60,7 +59,7 @@ record Options(File expected, File actual, Path jsonPath, Severity failAt, boole
 
     private static Severity parseSeverity(String value) {
         try {
-            return Severity.valueOf(value.toUpperCase(Locale.ROOT));
+            return Severity.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("--fail-at must be one of INFO, WARNING, ERROR (got '" + value + "')");
         }

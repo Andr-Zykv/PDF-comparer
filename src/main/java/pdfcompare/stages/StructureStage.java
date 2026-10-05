@@ -14,7 +14,6 @@ import pdfcompare.core.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -58,10 +57,8 @@ public final class StructureStage implements ComparisonStage {
             out.add(diff(Severity.ERROR, n, prefix + "size", size(boxA), size(boxB)));
         }
 
-        int rotA = normalizeRotation(a.getRotation());
-        int rotB = normalizeRotation(b.getRotation());
-        if (rotA != rotB) {
-            out.add(diff(Severity.ERROR, n, prefix + "rotation", String.valueOf(rotA), String.valueOf(rotB)));
+        if (a.getRotation() != b.getRotation()) {
+            out.add(diff(Severity.ERROR, n, prefix + "rotation", String.valueOf(a.getRotation()), String.valueOf(b.getRotation())));
         }
 
         Set<String> fontsA = fontNames(a);
@@ -95,10 +92,6 @@ public final class StructureStage implements ComparisonStage {
         return String.format(Locale.ROOT, "%.1fx%.1f", r.getWidth(), r.getHeight());
     }
 
-    private static int normalizeRotation(int degrees) {
-        return ((degrees % 360) + 360) % 360;
-    }
-
     /** Base font names with any subset prefix ("ABCDEF+") removed, so re-subsetting is not a difference. */
     private static Set<String> fontNames(PDPage page) throws IOException {
         Set<String> names = new TreeSet<>();
@@ -122,15 +115,14 @@ public final class StructureStage implements ComparisonStage {
         return name;
     }
 
-    private static int countImages(PDPage page) throws IOException {
+    private static int countImages(PDPage page) {
         PDResources res = page.getResources();
         if (res == null) {
             return 0;
         }
         int count = 0;
-        Iterator<COSName> it = res.getXObjectNames().iterator();
-        while (it.hasNext()) {
-            if (res.isImageXObject(it.next())) {
+        for (COSName cosName : res.getXObjectNames()) {
+            if (res.isImageXObject(cosName)) {
                 count++;
             }
         }
