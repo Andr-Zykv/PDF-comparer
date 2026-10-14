@@ -108,7 +108,7 @@ public final class StructureStage implements ComparisonStage {
         return names;
     }
 
-    private static String stripSubsetPrefix(String name) {
+    static String stripSubsetPrefix(String name) {
         if (name != null && name.length() > 7 && name.charAt(6) == '+' && name.substring(0, 6).chars().allMatch(Character::isUpperCase)) {
             return name.substring(7);
         }

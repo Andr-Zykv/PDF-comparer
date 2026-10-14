@@ -7,18 +7,21 @@ import java.util.List;
  * Longest Common Subsequence(LCS)-backed edit-script diff over two word lists. Package-private: an implementation
  * detail of {@link TextStage}.
  *
+ * <p>Words that match are reported as {@link OpType#EQUAL} ops, so callers can compare
+ * properties of the matched pair (font, colour) that the word text alone does not show.
+ *
  * <p>Builds the full dynamic-programming table, so it is O(n*m) time and space; callers should
  * bound the input sizes before calling {@link #diff}.
  */
 final class WordDiff {
 
-    enum OpType { REPLACE, DELETE, INSERT }
+    enum OpType { EQUAL, REPLACE, DELETE, INSERT }
 
     /**
-     * @param expectedIndex index into the expected list, meaningful for REPLACE and DELETE
-     * @param actualIndex   index into the actual list, meaningful for REPLACE and INSERT
+     * @param expectedIndex index into the expected list, meaningful for EQUAL, REPLACE and DELETE
+     * @param actualIndex   index into the actual list, meaningful for EQUAL, REPLACE and INSERT
      * @param anchor        expected-side position to report in a difference's path: the word
-     *                      itself for REPLACE/DELETE, or the insertion point for INSERT
+     *                      itself for EQUAL/REPLACE/DELETE, or the insertion point for INSERT
      */
     record Op(OpType type, int expectedIndex, int actualIndex, int anchor) {}
 
@@ -65,12 +68,14 @@ final class WordDiff {
 
         // Group consecutive non-equal steps into hunks and pair up deletes with inserts inside
         // each one, so a changed word reports as one REPLACE instead of a DELETE plus an INSERT.
+        // Equal steps end the current hunk and pass through as EQUAL ops.
         List<Op> ops = new ArrayList<>();
         List<int[]> deletes = new ArrayList<>();
         List<int[]> inserts = new ArrayList<>();
         for (int[] step : raw) {
             if (step[0] == 0) {
                 flushHunk(deletes, inserts, ops);
+                ops.add(new Op(OpType.EQUAL, step[1], step[2], step[1]));
                 continue;
             }
             (step[0] == 1 ? deletes : inserts).add(step);
