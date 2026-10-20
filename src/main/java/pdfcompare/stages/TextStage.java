@@ -27,14 +27,7 @@ import pdfcompare.core.Severity;
 import pdfcompare.core.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -117,7 +110,7 @@ public final class TextStage implements ComparisonStage {
      */
     private static final class StyleRuns {
         private final int page;
-        private final Map<String, Run> open = new LinkedHashMap<>();
+        private final Map<String, Run> open = new HashMap<>();
         private final List<Difference> done = new ArrayList<>();
 
         private static final class Run {
