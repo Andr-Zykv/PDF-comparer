@@ -15,7 +15,7 @@ mvn package
 java -jar [generated jar] <expected.pdf> <actual.pdf> [options]
 ```
 
-### options:
+### Options:
     --json <path>     write the JSON report here (default: <actual>.diff.json)
     --no-json         skip writing a JSON report
     --fail-at LEVEL   exit 1 if any difference reaches this severity (default: ERROR) 
